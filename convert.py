@@ -67,13 +67,14 @@ class JekyllFront:
         self.subtitle = subtitle
         self.author = author
         self.tags = tags
-        
-        del extra['layout']
-        if 'header-img' in extra:
-            extra['cover'] = extra.pop('header-img')
+
         self.extra = extra
 
     def to_zola_front(self):
+        if 'layout' in self.extra:
+            del self.extra['layout']
+        if 'header-img' in self.extra:
+            self.extra['cover'] = self.extra.pop('header-img')
         taxonomies = {}
         if self.tags:
             taxonomies["tags"] = self.tags
@@ -126,6 +127,7 @@ def convert_file(in_path, out_path):
     if jekyll_doc:
         zola_front = jekyll_doc.front.to_zola_front()
         zola_doc = ZolaDoc(zola_front, jekyll_doc.content)
+        os.makedirs(out_path, exist_ok=True)
         if os.path.isdir(out_path):
             out_path = os.path.join(out_path, in_path.name)
         else:
@@ -142,7 +144,7 @@ def parse_args():
                         r'..\\hibikilogy.github.io\\_posts\\', 
                         help="input dir or file")
     parser.add_argument("--outpath","-o", default=
-                        r'../v2-dev/content/', 
+                        r'../v2-dev/content/content', 
                         help="output dir or file")
     args = parser.parse_args()
     return args
